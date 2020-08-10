@@ -87,7 +87,7 @@ function create() {
   trumps = this.physics.add.group({
     key: 'trump',
     repeat: 11,
-    setXY: { x: 12, y: 500, stepX: 70 },
+    setXY: { x: 12, y: 300, stepX: 70 },
   })
 
   trumps.children.iterate(function (trump) {
@@ -161,9 +161,12 @@ function collectStar(poop, trump) {
   scoreText.setText('Score: ' + score)
 
   if (trumps.countActive(true) === 0) {
-    scoreText.setText('You win!')
-    gameOver = true
-    this.physics.pause()
+    //  A new batch of trumps to collect
+    trumps.children.iterate(function (trump) {
+      trump.enableBody(true, trump.x, 300, true, true)
+      trump.setVelocityX(Phaser.Math.FloatBetween(100, 200))
+      trump.setScale(0.25)
+    })
   }
 }
 
