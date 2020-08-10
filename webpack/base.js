@@ -7,7 +7,11 @@ module.exports = {
   mode: "development",
   devtool: "eval-source-map",
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    before: (app) => {
+      app.get('/assets/*.png', (req, res) => {
+        res.sendFile(`./src${req.url}`, { root: '.' })
+      })
+    },
   },
   module: {
     rules: [
@@ -29,9 +33,9 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin({
-      root: path.resolve(__dirname, "../")
-    }),
+    // new CleanWebpackPlugin({
+    //   root: path.resolve(__dirname, "../")
+    // }),
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
