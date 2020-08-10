@@ -4,8 +4,8 @@
   "description": "A Phaser 3 Project Template",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack --config webpack/prod.js ",
-    "start": "webpack-dev-server --config webpack/base.js --open"
+    "build": "webpack --config webpack/prod.js && cp -R static/* dist",
+    "dev": "webpack-dev-server --config webpack/base.js --open"
   },
   "repository": {
     "type": "git",
