@@ -90,12 +90,17 @@ function create() {
     setXY: { x: 12, y: 500, stepX: 70 },
   })
 
-  stars.children.iterate(function (child) {
+  stars.children.iterate(function (star) {
     //  Give each star a slightly different bounce
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+    star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+    star.setVelocityX(Phaser.Math.FloatBetween(100, 200))
   })
 
   bombs = this.physics.add.group()
+
+  this.input.keyboard.on('keydown-SPACE', (e) => {
+    bombs.create(player.x, player.y, 'bomb')
+  })
 
   //  The score
   scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' })
@@ -103,18 +108,28 @@ function create() {
   //  Collide the player and the stars with the platforms
   this.physics.add.collider(player, platforms)
   this.physics.add.collider(stars, platforms)
-  this.physics.add.collider(bombs, platforms)
+  // this.physics.add.collider(bombs, platforms)
 
   //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-  this.physics.add.overlap(player, stars, collectStar, null, this)
+  this.physics.add.overlap(bombs, stars, collectStar, null, this)
 
-  this.physics.add.collider(player, bombs, hitBomb, null, this)
+  // this.physics.add.collider(player, bombs, hitBomb, null, this)
 }
 
 function update() {
   if (gameOver) {
     return
   }
+
+  // stars.setVelocityX(100)
+  stars.children.iterate(function (star) {
+    //  Give each star a slightly different bounce
+    if (star.x < 0) {
+      star.setVelocityX(Phaser.Math.FloatBetween(100, 200))
+    } else if (star.x > 800) {
+      star.setVelocityX(Phaser.Math.FloatBetween(-100, -200))
+    }
+  })
 
   if (cursors.left.isDown) {
     player.setVelocityX(-160)
@@ -135,27 +150,28 @@ function update() {
   }
 }
 
-function collectStar(player, star) {
+function collectStar(bomb, star) {
+  bomb.disableBody(true, true)
   star.disableBody(true, true)
 
   //  Add and update the score
   score += 10
   scoreText.setText('Score: ' + score)
 
-  if (stars.countActive(true) === 0) {
-    //  A new batch of stars to collect
-    stars.children.iterate(function (child) {
-      child.enableBody(true, child.x, 0, true, true)
-    })
-
-    const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
-
-    const bomb = bombs.create(x, 16, 'bomb')
-    bomb.setBounce(1)
-    bomb.setCollideWorldBounds(true)
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
-    bomb.allowGravity = false
-  }
+//   if (stars.countActive(true) === 0) {
+//     //  A new batch of stars to collect
+//     stars.children.iterate(function (child) {
+//       child.enableBody(true, child.x, 0, true, true)
+//     })
+// 
+//     const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
+// 
+//     const bomb = bombs.create(x, 16, 'bomb')
+//     bomb.setBounce(1)
+//     bomb.setCollideWorldBounds(true)
+//     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
+//     bomb.allowGravity = false
+//   }
 }
 
 function hitBomb(player, bomb) {
