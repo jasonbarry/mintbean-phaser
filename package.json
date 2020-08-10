@@ -1,7 +1,7 @@
 {
-  "name": "phaser3-project-template",
+  "name": "dump-trump",
   "version": "1.1.0",
-  "description": "A Phaser 3 Project Template",
+  "description": "Dump Trump",
   "main": "src/index.js",
   "scripts": {
     "build": "webpack --config webpack/prod.js && mkdir -p dist/assets && cp -R src/assets/* dist/assets",
