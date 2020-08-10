@@ -20,8 +20,8 @@ const config = {
 }
 
 let player
-let stars
-let bombs
+let trumps
+let poops
 let platforms
 let cursors
 let score = 0
@@ -31,16 +31,16 @@ let scoreText
 const game = new Phaser.Game(config)
 
 function preload() {
-  this.load.image('sky', 'assets/sky.png')
+  this.load.image('hell', 'assets/hell.png')
   this.load.image('ground', 'assets/platform.png')
-  this.load.image('star', 'assets/star.png')
-  this.load.image('bomb', 'assets/bomb.png')
+  this.load.image('trump', 'assets/trump-96.png')
+  this.load.image('poop', 'assets/poop-96.png')
   this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 })
 }
 
 function create() {
   //  A simple background for our game
-  this.add.image(400, 300, 'sky')
+  this.add.image(400, 300, 'hell')
 
   //  The platforms group contains the ground and the 2 ledges we can jump on
   platforms = this.physics.add.staticGroup()
@@ -83,37 +83,39 @@ function create() {
   //  Input Events
   cursors = this.input.keyboard.createCursorKeys()
 
-  //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-  stars = this.physics.add.group({
-    key: 'star',
+  //  Some trumps to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+  trumps = this.physics.add.group({
+    key: 'trump',
     repeat: 11,
     setXY: { x: 12, y: 500, stepX: 70 },
   })
 
-  stars.children.iterate(function (star) {
-    //  Give each star a slightly different bounce
-    star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
-    star.setVelocityX(Phaser.Math.FloatBetween(100, 200))
+  trumps.children.iterate(function (trump) {
+    //  Give each trump a slightly different bounce
+    trump.setScale(0.25)
+    trump.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+    trump.setVelocityX(Phaser.Math.FloatBetween(100, 200))
   })
 
-  bombs = this.physics.add.group()
+  poops = this.physics.add.group()
 
   this.input.keyboard.on('keydown-SPACE', (e) => {
-    bombs.create(player.x, player.y, 'bomb')
+    const poop = poops.create(player.x, player.y, 'poop')
+    poop.setScale(0.5)
   })
 
   //  The score
   scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' })
 
-  //  Collide the player and the stars with the platforms
+  //  Collide the player and the trumps with the platforms
   this.physics.add.collider(player, platforms)
-  this.physics.add.collider(stars, platforms)
-  // this.physics.add.collider(bombs, platforms)
+  this.physics.add.collider(trumps, platforms)
+  // this.physics.add.collider(poops, platforms)
 
-  //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-  this.physics.add.overlap(bombs, stars, collectStar, null, this)
+  //  Checks to see if the player overlaps with any of the trumps, if he does call the collectStar function
+  this.physics.add.overlap(poops, trumps, collectStar, null, this)
 
-  // this.physics.add.collider(player, bombs, hitBomb, null, this)
+  // this.physics.add.collider(player, poops, hitBomb, null, this)
 }
 
 function update() {
@@ -121,13 +123,13 @@ function update() {
     return
   }
 
-  // stars.setVelocityX(100)
-  stars.children.iterate(function (star) {
-    //  Give each star a slightly different bounce
-    if (star.x < 0) {
-      star.setVelocityX(Phaser.Math.FloatBetween(100, 200))
-    } else if (star.x > 800) {
-      star.setVelocityX(Phaser.Math.FloatBetween(-100, -200))
+  // trumps.setVelocityX(100)
+  trumps.children.iterate(function (trump) {
+    //  Give each trump a slightly different bounce
+    if (trump.x < 0) {
+      trump.setVelocityX(Phaser.Math.FloatBetween(100, 200))
+    } else if (trump.x > 800) {
+      trump.setVelocityX(Phaser.Math.FloatBetween(-100, -200))
     }
   })
 
@@ -150,36 +152,27 @@ function update() {
   }
 }
 
-function collectStar(bomb, star) {
-  bomb.disableBody(true, true)
-  star.disableBody(true, true)
+function collectStar(poop, trump) {
+  poop.disableBody(true, true)
+  trump.disableBody(true, true)
 
   //  Add and update the score
   score += 10
   scoreText.setText('Score: ' + score)
 
-//   if (stars.countActive(true) === 0) {
-//     //  A new batch of stars to collect
-//     stars.children.iterate(function (child) {
-//       child.enableBody(true, child.x, 0, true, true)
-//     })
-// 
-//     const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
-// 
-//     const bomb = bombs.create(x, 16, 'bomb')
-//     bomb.setBounce(1)
-//     bomb.setCollideWorldBounds(true)
-//     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
-//     bomb.allowGravity = false
-//   }
+  if (trumps.countActive(true) === 0) {
+    scoreText.setText('You win!')
+    gameOver = true
+    this.physics.pause()
+  }
 }
 
-function hitBomb(player, bomb) {
-  this.physics.pause()
-
-  player.setTint(0xff0000)
-
-  player.anims.play('turn')
-
-  gameOver = true
-}
+// function hitBomb(player, poop) {
+//   this.physics.pause()
+// 
+//   player.setTint(0xff0000)
+// 
+//   player.anims.play('turn')
+// 
+//   gameOver = true
+// }
