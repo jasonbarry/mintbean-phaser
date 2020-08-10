@@ -1,10 +1,10 @@
 import Phaser from 'phaser'
 // import logoImg from './assets/logo.png'
 
-var config = {
+const config = {
   type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: 800,
+  height: 600,
   physics: {
     default: 'arcade',
     arcade: {
@@ -19,16 +19,16 @@ var config = {
   },
 }
 
-var player
-var stars
-var bombs
-var platforms
-var cursors
-var score = 0
-var gameOver = false
-var scoreText
+let player
+let stars
+let bombs
+let platforms
+let cursors
+let score = 0
+let gameOver = false
+let scoreText
 
-var game = new Phaser.Game(config)
+const game = new Phaser.Game(config)
 
 function preload() {
   this.load.image('sky', 'assets/sky.png')
@@ -47,15 +47,13 @@ function create() {
 
   //  Here we create the ground.
   //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-  platforms.create(400, 568, 'ground').setScale(2).refreshBody()
+  platforms.create(400, 150, 'ground').setScale(2).refreshBody()
 
   //  Now let's create some ledges
-  platforms.create(600, 400, 'ground')
-  platforms.create(50, 250, 'ground')
-  platforms.create(750, 220, 'ground')
+  platforms.create(400, 600, 'ground').setScale(2).refreshBody()
 
   // The player and its settings
-  player = this.physics.add.sprite(100, 450, 'dude')
+  player = this.physics.add.sprite(100, 50, 'dude')
 
   //  Player physics properties. Give the little guy a slight bounce.
   player.setBounce(0.2)
@@ -89,7 +87,7 @@ function create() {
   stars = this.physics.add.group({
     key: 'star',
     repeat: 11,
-    setXY: { x: 12, y: 0, stepX: 70 },
+    setXY: { x: 12, y: 500, stepX: 70 },
   })
 
   stars.children.iterate(function (child) {
@@ -150,9 +148,9 @@ function collectStar(player, star) {
       child.enableBody(true, child.x, 0, true, true)
     })
 
-    var x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
+    const x = player.x < 400 ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400)
 
-    var bomb = bombs.create(x, 16, 'bomb')
+    const bomb = bombs.create(x, 16, 'bomb')
     bomb.setBounce(1)
     bomb.setCollideWorldBounds(true)
     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
